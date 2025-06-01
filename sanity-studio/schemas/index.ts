@@ -3,6 +3,7 @@ import company from './documents/company'
 import jobPosting from './documents/jobPosting'
 import jobCategory from './documents/jobCategory'
 import jobApplication from './documents/jobApplication'
+import user from './documents/user'
 
 // Objects
 import location from './objects/location'
@@ -16,6 +17,7 @@ export const schemaTypes = [
   jobPosting,
   jobCategory,
   jobApplication,
+  user,
   
   // Objects
   location,
