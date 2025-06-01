@@ -110,27 +110,82 @@ export async function getCompanies(params: {
     location = '',
   } = params;
 
-  const companies = await sanityFetch<Company[]>(
-    queries.companiesQuery,
-    {
-      page,
-      pageSize,
-      search: search ? `*${search}*` : '',
-      size,
-      location,
-    },
-    ['companies']
-  );
+  try {
+    const companies = await sanityFetch<Company[]>(
+      queries.companiesQuery,
+      {
+        page,
+        pageSize,
+        search: search ? `*${search}*` : '',
+        size,
+        location,
+      },
+      ['companies']
+    );
 
-  return companies;
+    return companies;
+  } catch (error) {
+    console.error('Error fetching companies from Sanity, using mock data:', error);
+    // Fallback to mock data
+    const { mockCompanies } = await import('@/components/Public/mock-data');
+    
+    // Apply basic filtering to mock data
+    let filteredCompanies = mockCompanies;
+    
+    if (search) {
+      filteredCompanies = filteredCompanies.filter(company =>
+        company.name.toLowerCase().includes(search.toLowerCase())
+      );
+    }
+    
+    if (size) {
+      filteredCompanies = filteredCompanies.filter(company => company.size === size);
+    }
+    
+    if (location) {
+      filteredCompanies = filteredCompanies.filter(company =>
+        company.locations?.some(loc => 
+          loc.city.toLowerCase().includes(location.toLowerCase())
+        )
+      );
+    }
+    
+    // Apply pagination
+    const startIndex = (page - 1) * pageSize;
+    const endIndex = startIndex + pageSize;
+    
+    return filteredCompanies.slice(startIndex, endIndex);
+  }
 }
 
 export async function getCompanyBySlug(slug: string): Promise<Company | null> {
-  return sanityFetch<Company>(
-    queries.companyBySlugQuery,
-    { slug },
-    ['companies', `company-${slug}`]
-  );
+  try {
+    return await sanityFetch<Company>(
+      queries.companyBySlugQuery,
+      { slug },
+      ['companies', `company-${slug}`]
+    );
+  } catch (error) {
+    console.error('Error fetching company from Sanity, using mock data:', error);
+    // Fallback to mock data
+    const { mockCompanies } = await import('@/components/Public/mock-data');
+    return mockCompanies.find(company => company.slug.current === slug) || null;
+  }
+}
+
+export async function getJobsByCompany(companySlug: string): Promise<Job[]> {
+  try {
+    return await sanityFetch<Job[]>(
+      queries.jobsByCompanyQuery,
+      { companySlug },
+      ['jobs', `company-${companySlug}`]
+    );
+  } catch (error) {
+    console.error('Error fetching company jobs from Sanity, using mock data:', error);
+    // Fallback to mock data
+    const { mockJobs } = await import('@/components/Public/mock-data');
+    return mockJobs.filter(job => job.company.slug.current === companySlug);
+  }
 }
 
 // Application functions

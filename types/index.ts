@@ -45,11 +45,16 @@ export interface Company {
   logo?: any;
   description?: any[];
   website?: string;
+  email?: string;
+  phone?: string;
   size?: '1-10' | '11-50' | '51-200' | '200+';
   locations?: Location[];
   benefitsOffered?: string[];
   verified: boolean;
   ownerId?: string;
+  jobCount?: number;
+  activeJobs?: Job[];
+  createdAt?: string;
 }
 
 export interface JobCategory {

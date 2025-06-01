@@ -102,15 +102,6 @@ export const relatedJobsQuery = groq`
   }
 `;
 
-// Get jobs by company
-export const jobsByCompanyQuery = groq`
-  *[_type == "jobPosting" 
-    && status == "published"
-    && company._ref == $companyId
-  ] | order(publishedAt desc) {
-    ${jobProjection}
-  }
-`;
 
 // Get featured jobs for homepage
 export const featuredJobsQuery = groq`

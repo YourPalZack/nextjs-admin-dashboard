@@ -60,3 +60,46 @@ export const companyByOwnerQuery = groq`
     ${companyProjection}
   }
 `;
+
+// Get jobs by company slug
+export const jobsByCompanyQuery = groq`
+  *[_type == "jobPosting" && company->slug.current == $companySlug && status == "published"] | order(publishedAt desc) {
+    _id,
+    title,
+    slug,
+    description,
+    requirements,
+    responsibilities,
+    skills,
+    certifications,
+    salaryType,
+    salaryMin,
+    salaryMax,
+    showSalary,
+    location,
+    remoteOptions,
+    jobType,
+    category-> {
+      _id,
+      name,
+      slug
+    },
+    experienceLevel,
+    benefits,
+    applicationDeadline,
+    startDate,
+    expiresAt,
+    isUrgent,
+    featured,
+    publishedAt,
+    viewCount,
+    applicationCount,
+    company-> {
+      _id,
+      name,
+      slug,
+      logo,
+      verified
+    }
+  }
+`;
