@@ -1,61 +1,58 @@
-import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
-import Link from "next/link";
+'use client';
+
+import { signIn } from 'next-auth/react';
+import { Button } from '@/components/ui/button';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { Icons } from '@/components/icons';
+import Link from 'next/link';
 
 export default function SignInPage() {
   return (
-    <div className="container flex items-center justify-center min-h-[calc(100vh-4rem)] py-8">
+    <div className="min-h-screen flex items-center justify-center bg-gray-50">
       <Card className="w-full max-w-md">
-        <CardHeader>
-          <CardTitle>Sign In</CardTitle>
-          <CardDescription>
-            Choose your account type to continue
+        <CardHeader className="space-y-1">
+          <CardTitle className="text-2xl font-bold text-center">
+            Sign in to Colorado Trades Jobs
+          </CardTitle>
+          <CardDescription className="text-center">
+            Choose your preferred sign-in method
           </CardDescription>
         </CardHeader>
         <CardContent className="space-y-4">
-          <Button className="w-full" variant="outline" size="lg">
-            Continue with Google
-          </Button>
+          <div className="grid gap-4">
+            <Button
+              variant="outline"
+              onClick={() => signIn('google', { callbackUrl: '/dashboard' })}
+              className="w-full"
+            >
+              <Icons.google className="mr-2 h-4 w-4" />
+              Continue with Google
+            </Button>
+          </div>
           
           <div className="relative">
             <div className="absolute inset-0 flex items-center">
               <span className="w-full border-t" />
             </div>
             <div className="relative flex justify-center text-xs uppercase">
-              <span className="bg-background px-2 text-muted-foreground">
-                Or continue as
+              <span className="bg-white px-2 text-muted-foreground">
+                Or
               </span>
             </div>
           </div>
 
-          <div className="grid gap-4">
-            <Card className="cursor-pointer hover:shadow-md transition-shadow">
-              <CardContent className="p-6">
-                <h3 className="font-semibold mb-2">Job Seeker</h3>
-                <p className="text-sm text-muted-foreground">
-                  Find and apply for blue-collar jobs across Colorado
-                </p>
-              </CardContent>
-            </Card>
-
-            <Card className="cursor-pointer hover:shadow-md transition-shadow">
-              <CardContent className="p-6">
-                <h3 className="font-semibold mb-2">Employer</h3>
-                <p className="text-sm text-muted-foreground">
-                  Post jobs and manage applications from skilled workers
-                </p>
-              </CardContent>
-            </Card>
+          <div className="text-center text-sm">
+            <span className="text-muted-foreground">
+              New to Colorado Trades Jobs?{' '}
+            </span>
+            <Link 
+              href="/auth/signup" 
+              className="text-primary underline underline-offset-4 hover:text-primary/80"
+            >
+              Create an account
+            </Link>
           </div>
         </CardContent>
-        <CardFooter>
-          <p className="text-sm text-muted-foreground text-center w-full">
-            Don&apos;t have an account?{" "}
-            <Link href="/auth/signup" className="text-primary hover:underline">
-              Sign up
-            </Link>
-          </p>
-        </CardFooter>
       </Card>
     </div>
   );
