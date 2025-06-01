@@ -53,21 +53,28 @@ export async function getJobs(params: {
 }
 
 export async function getJobBySlug(slug: string): Promise<Job | null> {
-  const job = await sanityFetch<Job>(
-    queries.jobBySlugQuery,
-    { slug },
-    ['jobs', `job-${slug}`]
-  );
-  
-  // Increment view count
-  if (job) {
-    await client
-      .patch(job._id)
-      .inc({ viewCount: 1 })
-      .commit();
+  try {
+    const job = await sanityFetch<Job>(
+      queries.jobBySlugQuery,
+      { slug },
+      ['jobs', `job-${slug}`]
+    );
+    
+    // Increment view count
+    if (job) {
+      await client
+        .patch(job._id)
+        .inc({ viewCount: 1 })
+        .commit();
+    }
+    
+    return job;
+  } catch (error) {
+    console.error('Error fetching job by slug:', error);
+    // In development, you might want to return mock data
+    // For production, return null to show 404
+    return null;
   }
-  
-  return job;
 }
 
 export async function getRelatedJobs(
@@ -75,11 +82,16 @@ export async function getRelatedJobs(
   categoryId: string,
   city: string
 ): Promise<Job[]> {
-  return sanityFetch<Job[]>(
-    queries.relatedJobsQuery,
-    { currentSlug, categoryId, city },
-    ['jobs']
-  );
+  try {
+    return await sanityFetch<Job[]>(
+      queries.relatedJobsQuery,
+      { currentSlug, categoryId, city },
+      ['jobs']
+    );
+  } catch (error) {
+    console.error('Error fetching related jobs:', error);
+    return [];
+  }
 }
 
 // Company fetching functions
@@ -133,33 +145,41 @@ export async function createApplication(data: {
   };
   coverMessage?: string;
 }) {
-  // Check if already applied
-  const hasApplied = await sanityFetch<boolean>(
-    queries.hasAppliedQuery,
-    { jobId: data.jobId, email: data.applicantInfo.email }
-  );
+  try {
+    // Check if already applied
+    const hasApplied = await sanityFetch<boolean>(
+      queries.hasAppliedQuery,
+      { jobId: data.jobId, email: data.applicantInfo.email }
+    );
 
-  if (hasApplied) {
-    throw new Error('You have already applied to this job');
+    if (hasApplied) {
+      throw new Error('You have already applied to this job');
+    }
+
+    // Create application
+    const application = await client.create({
+      _type: 'jobApplication',
+      job: { _ref: data.jobId },
+      applicantInfo: data.applicantInfo,
+      coverMessage: data.coverMessage,
+      status: 'new',
+      appliedDate: new Date().toISOString(),
+    });
+
+    // Increment application count
+    await client
+      .patch(data.jobId)
+      .inc({ applicationCount: 1 })
+      .commit();
+
+    return application;
+  } catch (error) {
+    console.error('Error creating application:', error);
+    if (error instanceof Error) {
+      throw error;
+    }
+    throw new Error('Failed to submit application. Please try again.');
   }
-
-  // Create application
-  const application = await client.create({
-    _type: 'jobApplication',
-    job: { _ref: data.jobId },
-    applicantInfo: data.applicantInfo,
-    coverMessage: data.coverMessage,
-    status: 'new',
-    appliedDate: new Date().toISOString(),
-  });
-
-  // Increment application count
-  await client
-    .patch(data.jobId)
-    .inc({ applicationCount: 1 })
-    .commit();
-
-  return application;
 }
 
 // Category functions

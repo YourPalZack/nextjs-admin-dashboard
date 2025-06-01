@@ -43,6 +43,7 @@ const jobProjection = groq`
     name,
     slug,
     logo,
+    description,
     verified,
     size,
     website

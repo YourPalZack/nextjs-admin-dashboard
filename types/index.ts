@@ -6,9 +6,13 @@ export interface Job {
   company: Company;
   description: any[];
   requirements: string;
+  responsibilities?: string;
+  skills?: string[];
+  certifications?: string[];
   salaryType: 'hourly' | 'salary' | 'contract';
   salaryMin: number;
   salaryMax?: number;
+  showSalary?: boolean;
   location: {
     city: string;
     county: string;
@@ -18,11 +22,14 @@ export interface Job {
       lng: number;
     };
   };
+  remoteOptions?: 'onsite' | 'remote' | 'hybrid';
   jobType: 'full-time' | 'part-time' | 'contract' | 'temporary';
   category: JobCategory;
   experienceLevel: 'entry' | 'intermediate' | 'experienced';
   benefits: string[];
   applicationDeadline?: string;
+  startDate?: string;
+  expiresAt?: string;
   isUrgent: boolean;
   featured: boolean;
   status: 'draft' | 'published' | 'expired' | 'filled';
@@ -51,6 +58,7 @@ export interface JobCategory {
   slug: { current: string };
   description?: string;
   icon?: any;
+  jobCount?: number;
 }
 
 export interface JobApplication {
@@ -61,6 +69,7 @@ export interface JobApplication {
     email: string;
     phone: string;
     resumeUrl?: string;
+    linkedIn?: string;
   };
   coverMessage?: string;
   status: 'new' | 'reviewed' | 'interviewing' | 'hired' | 'rejected';
@@ -101,6 +110,7 @@ export interface ApplicationForm {
   phone: string;
   coverMessage?: string;
   resume?: File;
+  linkedIn?: string;
 }
 
 // User types
