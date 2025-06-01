@@ -105,13 +105,13 @@ export default defineType({
     },
     prepare(selection) {
       const {name, job, status, date} = selection
-      const statusEmoji = {
+      const statusEmoji = ({
         new: '🆕',
         reviewed: '👀',
         interviewing: '💬',
         hired: '✅',
         rejected: '❌',
-      }[status] || '❓'
+      } as Record<string, string>)[status] || '❓'
       
       return {
         title: `${statusEmoji} ${name}`,

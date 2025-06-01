@@ -47,7 +47,7 @@ const sidebarItems = [
   {
     title: "Analytics",
     href: "/dashboard/analytics",
-    icon: BarChart,
+    icon: BarChart3,
   },
   {
     title: "Settings",
@@ -317,11 +317,11 @@ export default function DashboardLayout({
               <div className="flex items-center gap-3 2xsm:gap-7">
                 <ul className="flex items-center gap-2 2xsm:gap-4">
                   <span className="text-sm text-muted-foreground">
-                    {session?.user?.company?.name || "Company"}
+                    {session?.user?.name || "User"}
                   </span>
                   <div className="h-8 w-8 rounded-full bg-primary/10 flex items-center justify-center">
                     <span className="text-sm font-medium">
-                      {session?.user?.company?.name?.charAt(0) || "C"}
+                      {session?.user?.name?.charAt(0) || "U"}
                     </span>
                   </div>
                 </ul>

@@ -1,43 +1,30 @@
-import { withAuth } from 'next-auth/middleware';
+import { auth } from '@/lib/auth';
 import { NextResponse } from 'next/server';
+import type { NextRequest } from 'next/server';
 
-export default withAuth(
-  function middleware(req) {
-    const token = req.nextauth.token;
-    const path = req.nextUrl.pathname;
+export default async function middleware(req: NextRequest) {
+  const session = await auth();
+  const path = req.nextUrl.pathname;
 
-    // Redirect to onboarding if user hasn't completed setup
-    if (token && !token.onboardingComplete && !path.startsWith('/onboarding')) {
-      return NextResponse.redirect(new URL('/onboarding', req.url));
+  // Check role-based access for dashboard
+  if (path.startsWith('/dashboard')) {
+    if (!session) {
+      return NextResponse.redirect(new URL('/auth/signin', req.url));
     }
-
-    // Check role-based access
-    if (path.startsWith('/dashboard') && token?.role === 'jobseeker') {
+    if (session.user.role !== 'employer') {
       return NextResponse.redirect(new URL('/jobs', req.url));
     }
-
-    return NextResponse.next();
-  },
-  {
-    callbacks: {
-      authorized: ({ token, req }) => {
-        const path = req.nextUrl.pathname;
-        
-        // Public paths
-        if (path.startsWith('/auth') || path === '/' || path.startsWith('/jobs') || path.startsWith('/companies')) {
-          return true;
-        }
-        
-        // Protected paths
-        if (path.startsWith('/dashboard') || path.startsWith('/apply')) {
-          return !!token;
-        }
-        
-        return true;
-      },
-    },
   }
-);
+
+  // Check if applying for jobs requires authentication
+  if (path.startsWith('/apply')) {
+    if (!session) {
+      return NextResponse.redirect(new URL('/auth/signin', req.url));
+    }
+  }
+
+  return NextResponse.next();
+}
 
 export const config = {
   matcher: [

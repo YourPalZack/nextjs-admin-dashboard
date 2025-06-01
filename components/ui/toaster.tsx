@@ -115,9 +115,9 @@ type ToastProps = React.ComponentPropsWithoutRef<typeof Toast>;
 
 type ToastActionElement = React.ReactElement<typeof ToastAction>;
 
-interface ToasterToast extends ToastProps {
+interface ToasterToast extends Omit<ToastProps, 'title'> {
   id: string;
-  title?: React.ReactNode;
+  title?: string;
   description?: React.ReactNode;
   action?: ToastActionElement;
 }
